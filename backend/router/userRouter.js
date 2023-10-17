@@ -34,7 +34,6 @@ UserRouter.get('/user', async(req, resp) => {
 UserRouter.get('/loggedInUser', async(req, resp) => {
    try{
       const email = req.query.email;
-      console.log(email);
     let result =(await User.findOne({email : email}));
    //  let result =await User.find({email : email})
     resp.send(result);
@@ -42,6 +41,21 @@ UserRouter.get('/loggedInUser', async(req, resp) => {
     resp.send({status : "error"});
    }
 });
+
+
+UserRouter.patch('/profileEdit/:email', async(req, resp) => {
+   try{
+       let result = await User.updateOne(
+         {email : req.params.email},
+         {$set : req.body}
+         )
+    resp.send(result);
+   }catch(error){
+    resp.send({status : "error"});
+   }
+});
+
+
 
 module.exports = UserRouter;
 

@@ -31,5 +31,16 @@ PostRouter.get('/getAllPost', async(req, resp) => {
    }
 });
 
+PostRouter.get('/user/post', async(req, resp) => {
+   try{
+      const email = req.query.email;
+    let result =await Post.find({email : email});
+     resp.send(result);
+   }catch(error){
+    resp.send({status : "error"});
+   }
+});
+
+
 module.exports = PostRouter;
 
