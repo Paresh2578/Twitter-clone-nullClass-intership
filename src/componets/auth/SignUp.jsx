@@ -11,6 +11,9 @@ import twitterimg from '../../imgs/logo.webp'
 //auth
 import { auth } from "../../context/firebase";
 
+//URL
+import { URL } from "../../util/URL";
+
 //css
 import "./Login.css"
 
@@ -18,7 +21,7 @@ import "./Login.css"
 const Signup = () => {
     let navigate = useNavigate();
     
-    const [data , setData] = useState({userName :"" ,fullName : "" , email : "", password : "" });
+    const [data , setData] = useState({userName :"" ,name : "" , email : "", password : "" });
 
     const [
         createUserWithEmailAndPassword,
@@ -29,8 +32,25 @@ const Signup = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        createUserWithEmailAndPassword(data.email , data.password);
-            navigate('/Home');
+
+        try{
+            createUserWithEmailAndPassword(data.email , data.password); 
+
+            let result = await fetch(`${URL}/user/register`, {
+                method : "POST",
+                body: JSON.stringify(data),
+                headers : {
+                    'content-type': 'application/json'
+                }
+            })
+            .then(res=>res.json())
+            .then(data => {
+                    navigate('/')
+            })
+        
+        }catch(error){
+            console.log(error);
+        }
 
     };
 
@@ -61,7 +81,7 @@ const Signup = () => {
                     <div className="">
                         <h2 className="heading text-light">Happening now</h2>
 
-                        <div class="d-flex align-items-sm-center">
+                        <div className="d-flex align-items-sm-center">
                             <h3 className="heading1 text-light"> Join X today </h3>
                         </div>
 
