@@ -14,6 +14,9 @@ import { auth } from "../../context/firebase";
 //URL
 import { URL } from "../../util/URL";
 
+//sweetAlrt
+import {SweetAlrt} from '../../util/SweetAlrt'
+
 //css
 import "./Login.css"
 
@@ -33,6 +36,7 @@ const Signup = () => {
          website :"",
          dob : ""
     });
+    const [loding , setLoding] = useState(false);
 
     const [
         createUserWithEmailAndPassword,
@@ -43,41 +47,60 @@ const Signup = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+        setLoding(true);
 
-        try{
-            createUserWithEmailAndPassword(data.email , data.password); 
 
-            let result = await fetch(`${URL}/user/register`, {
-                method : "POST",
-                body: JSON.stringify(data),
-                headers : {
-                    'content-type': 'application/json'
-                }
-            })
-            .then(res=>res.json())
-            .then(data => {
-                    navigate('/')
-            })
-        
-        }catch(error){
-            console.log(error);
+        if(data.name && data.userName && data.email && data.password){
+            try{
+                await fetch(`${URL}/user/userFind/${data.email}`)
+                .then(res=>res.json())
+                .then(async user => {
+                     if(user.length == 0){
+                        createUserWithEmailAndPassword(data.email , data.password)
+             
+                        await fetch(`${URL}/user/register`, {
+                            method : "POST",
+                            body: JSON.stringify(data),
+                            headers : {
+                                'content-type': 'application/json'
+                            }
+                        })
+                        .then(res=>res.json())
+                        .then(data => {
+                            SweetAlrt("SignIn succesfully" , "success")
+                                navigate('/')
+                                setLoding(false);
+                        })
+    
+                     }else{
+                        SweetAlrt("email already exists" , "error")
+                        console.log("email alredy exit");
+                        setLoding(false);
+                     }
+                })
+                    }catch(error){
+                        setLoding(false);
+                        SweetAlrt("something  wrong" , "error");
+                        console.log(error);
+                    }
+        }else{
+            SweetAlrt("invalid fild data" , "error")
+            setLoding(false);
         }
-
     };
 
     
-    const [signInWithGoogle, GoogleUser, GoogleLoading, GoogleError] = useSignInWithGoogle(auth);
+    // const [signInWithGoogle, GoogleUser, GoogleLoading, GoogleError] = useSignInWithGoogle(auth);
 
-    const handleGoogleSignIn = async (e) => {
-        e.preventDefault();
-        try {
-            await signInWithGoogle(data.email , data.password);
-            navigate("/Home");
-        } catch (error) {
-            console.log(error.message);
-        }
-    };
+    // const handleGoogleSignIn = async (e) => {
+    //     e.preventDefault();
+    //     try {
+    //         await signInWithGoogle(data.email , data.password);
+    //         navigate("/Home");
+    //     } catch (error) {
+    //         console.log(error.message);
+    //     }
+    // };
 
     return (
 
@@ -132,7 +155,7 @@ const Signup = () => {
                             </div>
                         </form>
                         <hr />
-                        <div className="google-button">
+                        {/* <div className="google-button">
                             <GoogleButton
 
                                 className="g-btn"
@@ -140,7 +163,7 @@ const Signup = () => {
 
                                 onClick={handleGoogleSignIn}
                             />
-                        </div>
+                        </div> */}
                         <div>
                             <span className="text-light">Already have an account?</span>
                             <Link

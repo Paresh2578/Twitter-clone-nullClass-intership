@@ -9,13 +9,23 @@ import { auth } from "../../context/firebase";
 //img
 import twitterimg from '../../imgs/logo.webp'
 
+//sweetAlrt
+import {SweetAlrt} from '../../util/SweetAlrt'
+
+//URL
+import { URL } from "../../util/URL";
+
 //css
 import "./Login.css";
+
+//mui
+import CircularProgress from '@mui/material/CircularProgress';
 
 const Login = () => {
     const navigate = useNavigate();
 
     const [data , setData] = useState({email : "", password : ""});
+    const [loding , setLoding] = useState(false);
 
     const [
         signInWithEmailAndPassword,
@@ -26,26 +36,58 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-       
+        setLoding(true);
 
         if(!error){
-            signInWithEmailAndPassword(data.email , data.password);
-            navigate('/');
+           
+            
+            
+        if(data.email && data.password){
+            
+            try{
+                
+                await fetch(`${URL}/user/checkUser/${data.email}/${data.password}`)
+                .then(res=>res.json())
+                .then(async user => {
+                     if(user.length != 0){
+                        signInWithEmailAndPassword(data.email , data.password)
+                        .then(data =>{
+                            setLoding(false);
+                            SweetAlrt("Login successfully" , "success");
+                            navigate('/');
+                        }).then((error)=>{
+                            setLoding(false);
+                            console.log(error);
+                        });
+             
+                     }else{
+                        SweetAlrt("Invalid email and  password" , "error")
+                     }
+                })
+                    }catch(error){
+                        SweetAlrt("something  wrong" , "error");
+                        setLoding(false);
+                        console.log(error);
+                    }
+        }else{
+            SweetAlrt("invalid fild data" , "error")
+            setLoding(false);
+        }
         }
 
     };
 
-    const [signInWithGoogle, GoogleUser, GoogleLoading, GoogleError] = useSignInWithGoogle(auth);
+    // const [signInWithGoogle, GoogleUser, GoogleLoading, GoogleError] = useSignInWithGoogle(auth);
 
-    const handleGoogleSignIn = async (e) => {
-        e.preventDefault();
-        try {
-            await signInWithGoogle();
-            navigate("/");
-        } catch (error) {
-            console.log(error.message);
-        }
-    };
+    // const handleGoogleSignIn = async (e) => {
+    //     e.preventDefault();
+    //     try {
+    //         await signInWithGoogle();
+    //         navigate("/");
+    //     } catch (error) {
+    //         console.log(error.message);
+    //     }
+    // };
 
 
 
@@ -78,11 +120,16 @@ const Login = () => {
 
 
                             <div className="btn-login">
-                                <button type="submit" className="btn" >Log In</button>
+                                {
+                                    !loading ? <button type="submit" className="btn" >Log In</button>
+                                    : 
+                                    <button type="submit" className="btn pt-2 pb-2" style={{backgroundColor : 'gray'}} disabled><CircularProgress size="1.5rem"/></button>
+                                }
+                               
                             </div>
                         </form>
                         <hr />
-                        <div>
+                        {/* <div>
                             <GoogleButton
                                 className="g-btn"
                                 type="light"
@@ -91,7 +138,7 @@ const Login = () => {
                             />
 
 
-                        </div>
+                        </div> */}
                     </div>
                     <div>
                         <spna className="text-light">Don't have an account?</spna>

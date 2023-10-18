@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import "./TweetBox.css";
-import { Avatar, Button } from "@mui/material";
-import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import axios from "axios";
 import { auth } from "../../../context/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -11,20 +9,26 @@ import useLoggedInUser from "../../../hooks/useLoggedInUser";
 //URL
 import { URL } from "../../../util/URL";
 
+//MUI
+import CircularProgress from '@mui/material/CircularProgress';
+import { Avatar, Button } from "@mui/material";
+import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
+
 function TweetBox() {
     const [loggedInUser] = useLoggedInUser();
-    // console.log(loggedInUser.userName);
-    const [isLoading , setIsLoading] = useState(false);
     const [ user ] = useAuthState(auth);
     const email = user?.email;
     const uName = loggedInUser?.userName;
     const LogeedName = loggedInUser?.name;
     const pImage = loggedInUser?.profileImage;
-    const [TweetPostData , setTweetPostData] = useState({  profilePhoto: pImage,post:"",  photo: "", name : "" , username : "" ,  email:email});
+    const [TweetPostData , setTweetPostData] = useState({  profilePhoto: "" ,post:"",  photo: "", name : "" , username : "" ,  email:email , likes : []});
+    
 
+    const [ImgUploadLoding , setImgUploadLoding] = useState(false);
+    const [loding , setLoding] = useState(false);
 
     const handleUploadImage = async(e) => {
-        setIsLoading(true);
+        setImgUploadLoding(true);
         const image = e.target.files[0];
 
         const formData = new FormData();
@@ -33,7 +37,7 @@ function TweetBox() {
         axios.post("https://api.imgbb.com/1/upload?key=c1e87660595242c0175f82bb850d3e15", formData)
             .then(res => {
                 setTweetPostData({...TweetPostData , photo :   res.data.data.display_url});
-                setIsLoading(false)
+                setImgUploadLoding(false)
             })
             .catch((error) => {
                 console.log(error);
@@ -42,17 +46,18 @@ function TweetBox() {
     }
     
     const handleTweet = async(e) => {
+        setLoding(true);
         e.preventDefault();
-        
             let result = await fetch(`${URL}/post/post`, {
                 method: "POST",
                 headers: {
                     'content-type': 'application/json'
                 },
-                body: JSON.stringify({ ...TweetPostData ,  name : LogeedName, username :uName}),
+                body: JSON.stringify({ ...TweetPostData ,  name : LogeedName, username :uName , profilePhoto : pImage}),
             })
             .then(res => res.json())
             .then(data => {
+                setLoding(false);
                 console.log(data);
             })
 
@@ -79,7 +84,7 @@ function TweetBox() {
             <div className="imageIcon_tweetButton">
                 <label htmlFor='image' className="imageIcon">
                     {
-                        isLoading ? <p>Uploading Image</p> : <p>{TweetPostData.photo ? 'Image Uploaded' : <AddPhotoAlternateOutlinedIcon />}</p>
+                        ImgUploadLoding ? <p>Uploading Image</p> : <p>{TweetPostData.photo ? 'Image Uploaded' : <AddPhotoAlternateOutlinedIcon />}</p>
                     }
                 </label>
                 <input
@@ -88,7 +93,16 @@ function TweetBox() {
                     className="imageInput"
                     onChange={handleUploadImage}
                 />
-                <Button className="tweetBox__tweetButton" type="submit">Tweet</Button>
+                {/* <Button className="tweetBox__tweetButton" type="submit">Tweet</Button> */}
+                
+                {
+                    ImgUploadLoding ? 
+                    <Button className="tweetBox__tweetButton"  disabled>Tweet</Button> : 
+                    loding ? 
+                    <Button  className="tweetBox__tweetButton" disabled ><CircularProgress size="1.5rem"/></Button>
+                    :
+                    <Button className="tweetBox__tweetButton" type="submit">Tweet</Button>
+                }
             </div>
         </form>
 

@@ -61,7 +61,7 @@ function Sidebar({handleLogout , user}) {
   return (
 
     <div className="sidebar" >
-      <TwitterIcon className="sidebar__twitterIcon" />
+      <TwitterIcon active className="sidebar__twitterIcon" />
       <CustomeLink to='/home/feed'>
         <SidebarOptions active Icon={HomeIcon} text="Home" />
       </CustomeLink>
