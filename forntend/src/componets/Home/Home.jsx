@@ -17,6 +17,7 @@ const Home = () => {
     const handleLogout = async () => {
         try {
              signOut(auth);
+             localStorage.clear("lodingUser");
             navigate("/login");
         } catch (error) {
             console.log(error.message);

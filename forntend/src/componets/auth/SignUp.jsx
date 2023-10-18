@@ -127,18 +127,21 @@ const Signup = () => {
                                 type="username"
                                 placeholder="@username "
                                onChange={(e)=>setData({...data , userName : e.target.value})}
+                               required
                             />
 
                             <input className="display-name" style={{ backgroudColor: "red" }}
                                 type="name"
                                 placeholder="Enter Full Name"
                                 onChange={(e) => setData({...data , name : e.target.value})}
+                                required
                             />
 
                             <input className="email"
                                 type="email"
                                 placeholder="Email address"
                                 onChange={(e) => setData({...data , email : e.target.value})}
+                                required
                             />
 
 
@@ -147,6 +150,7 @@ const Signup = () => {
                                 type="password"
                                 placeholder="Password"
                                 onChange={(e) => setData({...data , password : e.target.value})}
+                                required
                             />
 
 

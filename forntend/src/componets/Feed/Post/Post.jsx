@@ -2,6 +2,9 @@ import React , {useEffect, useState} from "react";
 import "./Post.css";
 
 
+//componets
+import LikedUserDisply from './LikedUserDisply'
+
 //mui
 import { Avatar, IconButton } from "@mui/material";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser"
@@ -14,14 +17,18 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 
 //URL
 import { URL } from "../../../util/URL";
+import { logEvent } from "firebase/analytics";
 
 
-function Post({ p  , email}) {
+function Post({ p}) {
   let { name, username, photo, post, profilePhoto, likes , _id } = p;
   const [isLiked, setIsLiked] = useState(false);
 
+  const loggedInUser_diteil = JSON.parse(localStorage.getItem("lodingUser"));
+  
+
   useEffect(()=>{
-    const likedPost = likes.some(u => u.email === email);
+    const likedPost = likes.some(u => u.email === loggedInUser_diteil.email);
     if(likedPost){
       setIsLiked(true);
     }
@@ -29,13 +36,14 @@ function Post({ p  , email}) {
 
   const handleLike =async ()=>{
     if(isLiked){
-      likes =  likes.filter((u) => u.email != email);
+      likes =  likes.filter((u) => u.email != loggedInUser_diteil.email);
       UpdateLiked();
       setIsLiked(false);
 
     }else{
+      likes = [...likes , {email : loggedInUser_diteil.email , name : loggedInUser_diteil.name ,userName : loggedInUser_diteil.userName , profilePhoto : loggedInUser_diteil.profileImage}];
       console.log(likes);
-      likes = [...likes , email ={email : email}];
+
       UpdateLiked();
       setIsLiked(true);
     }
@@ -43,6 +51,8 @@ function Post({ p  , email}) {
 
 
   //Update like function
+  
+
   const UpdateLiked = async()=>{
     try{
       fetch(`${URL}/post/liked/${_id}`, {
@@ -78,8 +88,19 @@ function Post({ p  , email}) {
     }
   }
 
+  //liked user vierw diigonal
+  const [open, setOpen] = useState(false);
+
+
+  const handleClickOpen = () => {
+    
+  };
+ 
+
+
   return (
     <div className="post" >
+      <LikedUserDisply open={open} setOpen={setOpen} likes={likes}/>
       <div className="post__avatar">
         <Avatar src={profilePhoto} />
       </div>
@@ -107,7 +128,7 @@ function Post({ p  , email}) {
                     <FavoriteIcon  color="error"></FavoriteIcon>
               </IconButton>
                   </div>
-              <div style={likesBtnStyle}>{formatNumberWithSuffix(likes.length)}</div>
+              <div style={likesBtnStyle}  onClick={()=>setOpen(true)}>{formatNumberWithSuffix(likes.length)+" like"}</div>
               </div>
               :
               <div className="post__footr__icon" style={{display : 'flex'}}>
@@ -116,7 +137,7 @@ function Post({ p  , email}) {
                     <FavoriteBorderIcon fontSize="small" />
               </IconButton>
                 </div>
-              <div style={likesBtnStyle}>{formatNumberWithSuffix(likes.length)}</div>
+              <div style={likesBtnStyle} onClick={()=> setOpen(true)}>{formatNumberWithSuffix(likes.length)+" like"}</div>
               </div>
           }
           <ChatBubbleOutlineIcon className="post__footer__icon" fontSize="small" />

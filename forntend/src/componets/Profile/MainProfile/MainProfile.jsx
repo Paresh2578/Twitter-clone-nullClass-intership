@@ -17,6 +17,10 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CenterFocusWeakIcon from '@mui/icons-material/CenterFocusWeak';
 import LockResetIcon from '@mui/icons-material/LockReset';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
+import CircularProgress from "@mui/material/CircularProgress";
+
+//SweetAlrt
+import {SweetAlrt} from '../../../util/SweetAlrt'
 
 
 const MainProfile = ({ user }) => {
@@ -26,16 +30,24 @@ const MainProfile = ({ user }) => {
   const [loggedInUser] = useLoggedInUser();
   const username = user?.email?.split('@')[0];
   const [posts, setPosts] = useState([]);
+  const [Postloding , setPostLoding] = useState(true);
 
   const email = loggedInUser?.email;
 
 
   useEffect(() => {
-    fetch(`${URL}/post/user/post?email=${email}`)
-        .then(res => res.json())
-        .then(data => {
-            setPosts(data.reverse());
-        })
+    try{
+      fetch(`${URL}/post/user/post?email=${email}`)
+      .then(res => res.json())
+      .then(data => {
+        setPostLoding(false);
+          setPosts(data.reverse());
+      })
+    }catch(error){
+      SweetAlrt("fatch all post fail", "error");
+      setPostLoding(false);
+      console.log(error);
+    }
 }, [email])
 
   const handleUploadCoverImage = e => {
@@ -179,8 +191,11 @@ const MainProfile = ({ user }) => {
                 <hr />
               </div>
               {
-                posts.map(p => <Post key={p._id} p={p} email={email} />)
-              }
+                Postloding ? <div style={{display: 'flex' ,  justifyContent:'center' ,  flexDrection:'row', paddingTop : '1rem' }}> <CircularProgress /></div>
+                :
+                 posts &&  posts.map(p => <Post key={p._id} p={p} email={email} />)
+                 
+            }
             </div>
           }
         </div>

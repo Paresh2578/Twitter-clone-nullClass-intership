@@ -14,6 +14,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { Avatar, Button } from "@mui/material";
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 
+//SweetAlrt
+import {SweetAlrt} from '../../../util/SweetAlrt'
+
 function TweetBox() {
     const [loggedInUser] = useLoggedInUser();
     const [ user ] = useAuthState(auth);
@@ -41,6 +44,7 @@ function TweetBox() {
             })
             .catch((error) => {
                 console.log(error);
+                SweetAlrt("post imag fail", "error");
             })
 
     }

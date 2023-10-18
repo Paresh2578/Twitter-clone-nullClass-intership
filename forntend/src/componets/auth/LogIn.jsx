@@ -51,9 +51,10 @@ const Login = () => {
                 .then(async user => {
                      if(user.length != 0){
                         signInWithEmailAndPassword(data.email , data.password)
-                        .then(data =>{
+                        .then(d =>{
                             setLoding(false);
                             SweetAlrt("Login successfully" , "success");
+                            localStorage.setItem("lodingUser" , JSON.stringify({name : user[0].name , userName : user[0].userName ,email : user[0].email , profileImage : user[0].profileImage}));
                             navigate('/');
                         }).then((error)=>{
                             setLoding(false);
@@ -110,12 +111,14 @@ const Login = () => {
                                 type="email" className="email"
                                 placeholder="Email address"
                                 onChange={(e) => setData({...data , email : e.target.value})}
+                                required
                             />
 
                             <input className="password"
                                 type="password"
                                 placeholder="Password"
                                 onChange={(e) => setData({...data , password : e.target.value})}
+                                required
                             />
 
 
@@ -154,7 +157,6 @@ const Login = () => {
                             Sign up
                         </Link>
                     </div>
-
                 </div>
 
 
