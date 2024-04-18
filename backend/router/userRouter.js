@@ -55,6 +55,24 @@ UserRouter.patch('/profileEdit/:email', async(req, resp) => {
    }
 });
 
+UserRouter.get('/userFind/:email' , async(req , resp)=>{
+   try{
+      let result = await User.find({email : req.params.email});
+      resp.send(result);
+   }catch(error){
+      resp.send({status:"error"});
+   }
+})
+
+UserRouter.get('/checkUser/:email/:password' , async(req , resp)=>{
+   try{
+      let result = await User.find({email : req.params.email , password : req.params.password});
+      resp.send(result);
+   }catch(error){
+      resp.send({status:"error"});
+   }
+})
+
 
 
 module.exports = UserRouter;

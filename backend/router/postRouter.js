@@ -41,6 +41,19 @@ PostRouter.get('/user/post', async(req, resp) => {
    }
 });
 
+PostRouter.patch('/liked/:id', async(req, resp) => {
+   // resp.send("done");
+   try{
+       let result = await Post.updateOne(
+         {_id : req.params.id},
+         {$set : req.body}
+         )
+    resp.send(result);
+   }catch(error){
+    resp.send({status : "error"});
+   }
+});
+
 
 module.exports = PostRouter;
 

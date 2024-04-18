@@ -25,7 +25,10 @@ const postSchema = new mongoose.Schema({
           email: {
             type : String,
             require : true
-          }
+          },
+          likes :[
+            {email : String  , name : String ,userName : String, profilePhoto : String}
+          ]
         }
       )
 
